@@ -1,56 +1,64 @@
-import { promises as fs } from 'fs';
+import { promises as fs, Stats } from 'fs';
 import * as path from 'path';
-import { inspect } from 'util';
+import * as R from 'ramda';
 
-const sleep = time => new Promise(r => setTimeout(r, time));
+interface FileSystemEntry {
+    absolutePath: string;
+    isDirectory: boolean;
+    isFile: boolean;
 
-class Flags {
-    _flags = [];
+    dev: number;
+    ino: number;
+    mode: number;
+    nlink: number;
+    uid: number;
+    gid: number;
+    rdev: number;
+    size: number;
+    blksize: number;
+    blocks: number;
+    atimeMs: number;
+    mtimeMs: number;
+    ctimeMs: number;
+    birthtimeMs: number;
+    atime: Date;
+    mtime: Date;
+    ctime: Date;
+    birthtime: Date;
+}
 
-    push(x) {
-        if (this._flags.find(y => y === x)) {
-            return;
-        } else {
-            this._flags.push(x);
-        }
-    }
+const zipWith = (a1, a2, f) => a1.map((x, i) => f(x, a2[i]));
 
-    match(x) {
-        return this._flags.find(y => y === x);
-    }
-
-    get empty() {
-        return this._flags.length === 0;
+const helpers = {
+    fullReaddir: async dirname => {
+        const names = await fs.readdir(dirname);
+        const absolutePaths = names.map(ent => path.resolve(dirname, ent));
+        const stats = await Promise.all(absolutePaths.map(ent => fs.stat(ent)));
+        const create = (s, ent) => ({
+            ...s,
+            absolutePath: ent,
+            isFile: s.isFile(),
+            isDirectory: s.isDirectory()
+        });
+        const fsEntries = zipWith(stats, absolutePaths, create);
+        return fsEntries as FileSystemEntry[];
     }
 }
 
 class LS {
 
-    private flags = new Flags;
-
-
-    get R() {
-        this.flags.push('R')
-        return this;
+    shallow(dirname = __dirname) {
+        return helpers.fullReaddir(dirname);
     }
 
-    async _(dirname = __dirname) {
-        if (this.flags.match('R')) {
-            const arr = await fs.readdir(dirname);
-            const allFiles = await Promise.all(arr.map(async subdir => {
-                const p = path.resolve(dirname, subdir);
-                const stats = await fs.stat(p)
-                return stats.isDirectory()
-                    ? this._(p)
-                    : p;
-            }))
 
-            return allFiles.reduce((ac, x) => ac.concat(x), []);
-            // return allFiles;
-        } else if (this.flags.empty) {
-            const allFiles = await fs.readdir(dirname);
-            return allFiles.map(x => path.resolve(dirname, x));
-        }
+    async recursive(dirname = __dirname) {
+        const fsEntries = await this.shallow(dirname);
+        const files = fsEntries.filter(ent => ent.isFile);
+        const directories = fsEntries.filter(ent => ent.isDirectory);
+        const belowP = directories.map(dir => this.recursive(dir.absolutePath));
+        const below = await Promise.all(belowP);
+        return [files, directories, below];
     }
 }
 
@@ -60,14 +68,16 @@ class Shell {
     }
 }
 
-
-
 const main = async () => {
     const $ = new Shell();
-    const res = await $.ls.R._('./testdir');
+    const res = await $.ls.recursive('./testdir');
+    //@ts-ignore
+    const x = R.flatten(res)
 
-    
-    console.log(res);
+    console.log(x);
+    console.log(x.length);
+    //@ts-ignore
+    console.log(x.map(x => x.absolutePath));
 }; main();
 
 
