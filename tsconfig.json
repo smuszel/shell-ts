@@ -1,0 +1,10 @@
+{
+    "compileOnSave": true,
+    "compilerOptions": {
+        "target": "es2017",
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "lib": ["es2018"],
+        "sourceMap": true
+    }
+}

@@ -1,0 +1,17 @@
+{
+  "name": "shell-ts",
+  "version": "0.0.1",
+  "description": "Fluent, unix like interface with helpers around core node functionalities.",
+  "scripts": {
+    "test": "test"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@types/node": "^10.7.0",
+    "@types/ramda": "^0.25.36",
+    "ramda": "^0.25.0",
+    "ts-node": "^7.0.1",
+    "typescript": "^3.0.1"
+  }
+}
