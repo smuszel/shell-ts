@@ -1,6 +1,6 @@
-import { promises as fs, Stats } from 'fs';
+import { promises as fs } from 'fs';
 import * as path from 'path';
-import * as R from 'ramda';
+import { flatten } from './tools';
 
 interface FileSystemEntry {
     absolutePath: string;
@@ -47,18 +47,19 @@ const helpers = {
 
 class LS {
 
-    shallow(dirname = __dirname) {
+    shallow(dirname = __dirname): Promise<FileSystemEntry[]> {
         return helpers.fullReaddir(dirname);
     }
 
 
-    async recursive(dirname = __dirname) {
+    async recursive(dirname = __dirname): Promise<FileSystemEntry[]> {
         const fsEntries = await this.shallow(dirname);
         const files = fsEntries.filter(ent => ent.isFile);
         const directories = fsEntries.filter(ent => ent.isDirectory);
         const belowP = directories.map(dir => this.recursive(dir.absolutePath));
         const below = await Promise.all(belowP);
-        return [files, directories, below];
+        const res = flatten([files, directories, below]);
+        return res;
     }
 }
 
@@ -71,13 +72,8 @@ class Shell {
 const main = async () => {
     const $ = new Shell();
     const res = await $.ls.recursive('./testdir');
-    //@ts-ignore
-    const x = R.flatten(res)
 
-    console.log(x);
-    console.log(x.length);
-    //@ts-ignore
-    console.log(x.map(x => x.absolutePath));
+    console.log(res);
 }; main();
 
 
