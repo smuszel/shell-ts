@@ -1,7 +1,6 @@
-import { flatten } from './../tools';
-import { resolve, basename } from 'path';
+import { resolve } from 'path';
 import * as fs from 'fs';
-import { exists, existsAsDirectory, isDirectory } from '../helpers';
+import { exists, isDirectory } from '../helpers';
 
 
 export default class Cp {
@@ -41,19 +40,6 @@ class CpForce {
 }
 
 class CpRecursive {
-
-//     const triesOverwriting = await exists(destination);
-
-//     if(triesOverwriting) {
-//         throw new Error('Overwite attempt');
-//     } else {
-//     const p = fs.promises.copyFile(source, destination);
-//     return p;
-// }
-//     async shx(source, destination): Promise<void> {
-//         const p = fs.promises.copyFile(source, destination);
-//         return p;
-//     }
 }
 
 class CpRecursiveForce {
@@ -67,7 +53,6 @@ class CpRecursiveForce {
         const newDestinationPath = n => resolve(destination, n);
         const newSourcePath = n => resolve(source, n);
 
-        // it is sub-optimal to call shx, because we know that n exists
         const ps = subentries.map(n => this._execute(newSourcePath(n), newDestinationPath(n)));
         const p = Promise.all(ps);
 
