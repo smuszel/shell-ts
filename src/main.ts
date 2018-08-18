@@ -8,7 +8,8 @@ const main = async () => {
     const name3 = 'xyz.txt';
     const name4 = 'abc.txt';
 
-    const res = await $.cp.rf.shx(name1, name2);
+    // const res = await $.cp.rf.shx(name1, name2);
+    const res = $.cp.rf.shx(name1, name2);
     console.log(res);
 
 }; main();
