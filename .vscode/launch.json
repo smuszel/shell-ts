@@ -1,12 +1,13 @@
 {
     "version": "0.2.0",
     "configurations": [
+        
         {
             "name": "TS node debug",
             "type": "node",
             "request": "launch",
             "args": [
-                "${relativeFile}"
+                "${workspaceRoot}/src/main.ts"
             ],
             "runtimeArgs": [
                 "--nolazy",

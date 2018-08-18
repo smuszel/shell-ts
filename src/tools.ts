@@ -6,3 +6,6 @@ export const flatten = (arr: any[]): any[] => {
     
     return arr.reduce(h, []);
 }
+
+export const zipWith = (a1, a2, f) => a1.map((x, i) => f(x, a2[i]));
+

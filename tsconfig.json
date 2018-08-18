@@ -1,10 +1,15 @@
 {
     "compileOnSave": true,
     "compilerOptions": {
-        "target": "es2017",
+        "target": "es2018",
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
         "lib": ["es2018"],
-        "sourceMap": true
-    }
+        "sourceMap": false,
+        "typeRoots": ["./@types", "./node_modules/@types"],
+        "composite": true,
+        "pretty": true,
+        "outDir": "./lib",
+    },
+    "include": ["src/**/*"]
 }
