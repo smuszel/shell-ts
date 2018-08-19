@@ -13,26 +13,26 @@ export const fullReaddir = async dirname => {
         ...s,
         absolutePath: ent,
         isFile: s.isFile(),
-        isDirectory: s.isDirectory()
+        isDirectory: s.isDirectory(),
     });
     const fsEntries = zipWith(stats, absolutePaths, create);
     return fsEntries as FileSystemEntry[];
-}
+};
 
 export const isDirectory = dirname => {
     return fsp.stat(dirname).then(r => r.isDirectory());
-}
+};
 
 export const exists = dirname => {
-    return promisify(fs.exists)(dirname)
-}
+    return promisify(fs.exists)(dirname);
+};
 
 export const existsAsDirectory = async dirname => {
     const present = await exists(dirname);
 
     if (present) {
-        return isDirectory(dirname)
+        return isDirectory(dirname);
     } else {
         return false;
     }
-}
+};

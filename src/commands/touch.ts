@@ -2,8 +2,9 @@ import * as fs from 'fs';
 import { promisify } from 'util';
 
 const _createOrAppendNothing = name => {
-    const p = new Promise(rez => {
+    const p = new Promise((rez, rej) => {
         const strm = fs.createWriteStream(name, { flags: 'a' });
+        strm.on('error', rej)
         strm.addListener('close', () => rez())
         strm.close();
     }) as Promise<void>;
@@ -19,7 +20,7 @@ const _opencloseExistingFile = async name => {
     }
 }
 
-export default class Touch {
+class Touch {
 
     get c() {
         return new TouchDontCreate();
@@ -42,3 +43,5 @@ class TouchDontCreate {
         return p;
     }
 }
+
+export default new Touch

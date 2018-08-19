@@ -3,8 +3,7 @@ import { promises as fs } from 'fs';
 import { resolve } from 'path'; 
 import { isDirectory, fullReaddir } from '../helpers';
 
-
-export default class Ls {
+class Ls {
     
    private  _shallow = async dirname => {
         const entryNames = await fs.readdir(dirname);
@@ -61,3 +60,5 @@ class LsRecursive {
         }
     }
 }
+
+export default new Ls;

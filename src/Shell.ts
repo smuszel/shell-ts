@@ -1,22 +1,11 @@
-import LS from './commands/ls';
-import Touch from './commands/touch';
-import Stat from './commands/stat';
-import Cp from './commands/cp';
+import ls from './commands/ls';
+import touch from './commands/touch';
+import stat from './commands/stat';
+import cp from './commands/cp';
 
-export default class Shell {
-    get ls() {
-        return new LS();
-    }
-
-    get touch() {
-        return new Touch();
-    }
-
-    get stat() {
-        return new Stat();
-    }
-
-    get cp() {
-        return new Cp();
-    }
+export const shell = {
+    ls,
+    touch,
+    stat,
+    cp
 }
