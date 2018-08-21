@@ -40,9 +40,9 @@ class MvForce {
                 return this.shx(source, newDest);
             }
         }
-        // two possible fall cases
+        
         return fsp.rename(source, destination);
     }
 }
 
-export default new Mv;
+export default new Mv();

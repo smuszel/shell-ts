@@ -1,10 +1,9 @@
 import mv from '../src/commands/mv';
-
 import { promises as fsp } from 'fs';
-import { expect, assert } from 'chai';
+import { assert } from 'chai';
 import { resolve, join, basename } from 'path';
 import { exists } from '../src/helpers';
-import { rimrafSync, promiseForPrompt } from './util';
+import { rimrafSync, rejects } from './util';
 
 const root = resolve('temp', 'mv_root');
 
@@ -13,9 +12,6 @@ const existingFile2 = join(root, 'abc2.txt');
 const existingDir = join(root, 'abc');
 
 const nonExistingWithin = join(root, 'xxx.txt');
-
-const nonExistingWithout = join(root, 'remote', 'xxx.txt');
-
 
 beforeEach('Content setup', async () => {
     await fsp.mkdir(root);
@@ -31,21 +27,7 @@ afterEach('Content removal', () => {
 });
 
 describe('mv', () => {
-    it('given empty source, throws', async () => {
-        const a = await mv.shx(nonExistingWithin, nonExistingWithout).catch(() => 'throw');
-        expect(a).to.equal('throw');
-    })
     
-    it('given destination without existing path, throws', async () => {
-        const a = await mv.shx(existingFile1, nonExistingWithout).catch(() => 'throw');
-        expect(a).to.equal('throw');
-    })
-    
-    it('given destination as other file, throws', async () => {
-        const a = await mv.shx(existingFile1, existingFile2).catch(() => 'throw');
-        expect(a).to.equal('throw');
-    })
-
     it('given empty destination with existing path, moves entry at source', async () => {
         await mv.shx(existingFile1, nonExistingWithin);
         const [sourceExists, destinationExists] = await Promise.all([
@@ -53,8 +35,12 @@ describe('mv', () => {
             exists(nonExistingWithin)
         ]);
         
-        expect(sourceExists).false;
-        expect(destinationExists).true;
+        assert(!sourceExists);
+        assert(destinationExists);
+    })
+
+    it('given destination as other file, throws', async () => {
+        rejects(mv.shx(existingFile1, existingFile2));
     })
 
     it('given destination as directory, attempts to move source inside', async () => {
@@ -70,21 +56,21 @@ describe('mv', () => {
             exists(existingFile1),
             fsp.stat(existingDir),
             exists(hopPath)
-            ]);
+        ]);
         
-        expect(sourceExists).false;
-        expect(destinationStat.isDirectory()).true;
-        expect(sourceInDestination).true;
+        assert(!sourceExists);
+        assert(destinationStat.isDirectory());
+        assert(sourceInDestination);
     })
 })
 
 describe('mv -f', () => {
 
-    it('given source as directory and destination as file, moves directory in place of file', async () => {
+    it('given source as directory and destination as file, overwrites', async () => {
         await mv.f.shx(existingDir, existingFile1);
+        const stat = await fsp.stat(existingFile1);
 
-        const stat = await fsp.stat(existingFile1)
-        expect(stat.isDirectory()).true;
+        assert(stat.isDirectory());
     })
 
     it('given conflict, overwrites file in destination', async () => {
@@ -92,26 +78,13 @@ describe('mv -f', () => {
             fsp.readFile(existingFile1, 'utf8'),
             fsp.readFile(existingFile2, 'utf8'),
         ]);
-        
         await mv.f.shx(existingFile1, existingFile2);
         
         const content2After = await fsp.readFile(existingFile2, 'utf8');
         const soureStillExists = await exists(existingFile1);
 
-        expect(soureStillExists).false;
-        expect(content2After).to.equal(content1Before);
-        expect(content2After).to.not.equal(content2Before);
-
+        assert(!soureStillExists);
+        assert(content2After === content1Before);
+        assert(content2After !== content2Before);
     })
-
-    it('abc', () => {
-        const assertRejection = (prom: Promise<any>) => {
-            assert.isExtensible(prom.catch(() => ({})))
-        }
-
-        expect(true);
-        expect(!!'').false;
-
-        assertRejection(Promise.reject())
-    }) 
 })

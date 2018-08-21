@@ -19,7 +19,8 @@
         "mocha": "^5.2.0"
     },
     "scripts": {
-        "test": "mkdir -p temp & mocha test -r ts-node/register test/**/mv.spec.ts",
-        "test:debug": "mkdir -p temp & mocha test -r ts-node/register test/**/mv.spec.ts --inspect-brk"
+        "test:all": "mkdir -p temp & mocha test -r ts-node/register test/**/*.spec.ts",
+        "test": "mkdir -p temp & mocha test -r ts-node/register test/**/touch.spec.ts",
+        "test:debug": "mkdir -p temp & mocha test -r ts-node/register test/**/touch.spec.ts --inspect-brk"
     }
 }

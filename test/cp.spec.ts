@@ -1,216 +1,198 @@
-import { promises as fsp, existsSync } from 'fs';
-import { expect } from 'chai';
+import { rejects, rimrafSync } from './util';
+import { promises as fsp,  } from 'fs';
+import { assert } from 'chai';
 import { resolve, join } from 'path';
 import cp from '../src/commands/cp';
-import { exec } from 'child_process';
 
-const nonExisting1 = resolve('temp', 'cpne.ts');
-const nonExisting2 = resolve('temp', 'cpne', 'cpne.ts');
-const emptyDirectory = resolve('temp', 'cpdir')
+const emptySpaceBasename = 'vvv';
+const existingDirectoryBasename = 'aaa';
+const otherExistingDirectoryBasename = 'bbb';
+const fixRoot = p => p.replace(existingDirectoryBasename, emptySpaceBasename);
+const problem = __dirname.toString().includes(existingDirectoryBasename);
 
-const source_root = resolve('temp', 'Scproot');
-const source_subdirectory = join(source_root, 'Sdir1');
-const source_file1 = join(source_root, 'Scp1.ts');
-const source_file2 = join(source_subdirectory, 'Scp2.ts');
-const source_file3 = join(source_subdirectory, 'Scp3.ts');
+if (problem) {
+    throw new Error('current path has conflict with tests');
+}
 
-const destination_root = resolve('temp', 'Dcproot');
-const destination_subdirectory = join(destination_root, 'Sdir1');
-const destination_file1 = join(destination_root, 'Scp1.ts');
-const destination_file2 = join(destination_subdirectory, 'Scp2.ts');
-const destination_file3 = join(destination_subdirectory, 'Scp3.ts');
-const destination_within_existing_dir = resolve('temp', 'Scpx.ts');
+const root = resolve('temp', 'cp_root');
+const emptySpace = join(root, emptySpaceBasename);
 
-const other_existing_file = resolve('temp', 'Ecpx.ts')
-const destination_existing_root = resolve('temp', 'Ecproot');
-const destination_existing_subdirectory = join(destination_existing_root, 'Sdir1');
-const destination_existing_file1 = join(destination_existing_root, 'Ecp1.ts');
-const destination_existing_file2 = join(destination_existing_subdirectory, 'Scp2.ts');
-const destination_existing_file3 = join(destination_existing_subdirectory, 'Scp3.ts');
-const destination_existing_omited_dir = join(destination_existing_root, 'ddd');
+const existingDirectory = join(root, existingDirectoryBasename);
+const existingSubdirectory = join(existingDirectory, 'sub');
+const existingSubfile = join(existingSubdirectory, 'x.ts');
+const existingFile1 = join(existingDirectory, 'x.ts');
+const existingFile2 = join(existingDirectory, 'y.ts');
 
-before('set up directory structure', async () => {
+const otherExistingDirectory = join(root, otherExistingDirectoryBasename);
+const otherExistingSubdirectory1 = join(otherExistingDirectory, 'sub');
+const otherExistingSubdirectory2 = join(otherExistingDirectory, 'sub_');
+const otherExistingSubfile1 = join(otherExistingSubdirectory1, 'x.ts');
+const otherExistingSubfile2 = join(otherExistingSubdirectory1, 'y.ts');
+const otherExistingFile1 = join(otherExistingDirectory, 'x.ts');
+const otherExistingFile2 = join(otherExistingDirectory, 'y.ts');
+const otherExistingFile3 = join(otherExistingDirectory, 'z.ts');
+
+
+beforeEach('set up directory structure', async () => {
+    await new Promise(rez => setTimeout(rez, 0));
+
+    await fsp.mkdir(root);
+
     await Promise.all([
-        fsp.mkdir(source_root),
-        fsp.mkdir(destination_existing_root),
-        fsp.mkdir(emptyDirectory),
+        fsp.mkdir(existingDirectory),
+        fsp.mkdir(otherExistingDirectory),
     ]);
 
     await Promise.all([
-        fsp.mkdir(source_subdirectory),
-        fsp.mkdir(destination_existing_subdirectory),
-        fsp.mkdir(destination_existing_omited_dir),
+        fsp.mkdir(existingSubdirectory),
+        fsp.mkdir(otherExistingSubdirectory1),
+        fsp.mkdir(otherExistingSubdirectory2),
     ]);
 
     await Promise.all([
-        fsp.writeFile(source_file1, 'a'),
-        fsp.writeFile(source_file2, 'b'),
-        fsp.writeFile(source_file3, 'c'),
-        fsp.writeFile(other_existing_file, 'x'),
+        fsp.writeFile(existingSubfile, 'a'),
+        fsp.writeFile(existingFile1, 'b'),
+        fsp.writeFile(existingFile2, 'c'),
 
-        fsp.writeFile(destination_existing_file1, 'a!'),
-        fsp.writeFile(destination_existing_file2, 'b!'),
-        fsp.writeFile(destination_existing_file3, 'c!'),
+        fsp.writeFile(otherExistingSubfile1, '_a_'),
+        fsp.writeFile(otherExistingSubfile2, '_b_'),
+        fsp.writeFile(otherExistingFile1, '_c_'),
+        fsp.writeFile(otherExistingFile2, '_d_'),
+        fsp.writeFile(otherExistingFile3, '_e_'),
     ]);
 });
 
-after('remove directory', async () => {
-    exec('rm -rf temp/*');
+afterEach('remove directory', () => {
+    rimrafSync('temp/cp_root');
 });
 
 describe('cp', async () => {
 
-    it('given a directory, throws', async () => {
-        const a = await cp.shx(source_root, destination_root).catch(() => 'throw');
-        expect(a).to.equal('throw');
-    });
+    it('given a file and empty destination within existing directory, clones file', async () => {
+        await cp.shx(existingSubfile, emptySpace);
 
-    it('given a file and empty destination within existing directory, clones file to destination', async () => {
-        await cp.shx(source_file1, destination_within_existing_dir);
 
         const [sourceContent, destinationContent] = await Promise.all([
-            fsp.readFile(source_file1, 'utf8'),
-            fsp.readFile(destination_within_existing_dir, 'utf8'),
+            fsp.readFile(existingSubfile, 'utf8'),
+            fsp.readFile(emptySpace, 'utf8'),
         ]);
 
-        expect(sourceContent).to.equal(destinationContent);
-        expect(!!sourceContent).true;
+        assert(sourceContent === destinationContent);
+        assert(!!sourceContent);
     });
 
-    it('given a file and existing destination, throws', async () => {
-        const a = await cp.shx(source_file1, other_existing_file).catch(() => 'throw');
-        expect(a).to.equal('throw');
+    it('given a directory, throws', async () => {
+        rejects(cp.shx(existingDirectory, emptySpace));
     });
 
-    it('given a file and empty destination without existing directory, throws', async () => {
-        const a = await cp.shx(source_file1, destination_file3).catch(() => 'throw');
-        expect(a).to.equal('throw');
-    });
-
-    it('given a file and existing destination, throws', async () => {
-        const a = await cp.shx(source_file1, destination_existing_file1).catch(() => 'throw');
-        expect(a).to.equal('throw');
-    });
-
-    it('given non existing source, throws', async () => {
-        const a = await cp.shx(nonExisting1, nonExisting2).catch(() => 'throw');
-        const b = await cp.shx(nonExisting1, destination_existing_file1).catch(() => 'throw');
-        
-        expect(a).to.equal('throw');
-        expect(b).to.equal('throw');
+    it('given any conflict, throws', () => {
+        rejects(cp.shx(existingFile1, existingFile2));
     });
 });
 
 describe('cp -f', async () => {
 
-    it('given a file and existing destination, overwrites', async () => {
-        const targetContentBefore = fsp.readFile(other_existing_file, 'utf8');
-        await cp.f.shx(source_file1, other_existing_file);
-        const targetContentAfter = await fsp.readFile(other_existing_file, 'utf8');
-        const sourceContent = await fsp.readFile(source_file1, 'utf8');
+    it('given a file and existing destination as file, overwrites', async () => {
+        const destinationContentBefore = await fsp.readFile(existingFile2, 'utf8');
+        const sourceContentBefore = await fsp.readFile(existingFile1, 'utf8');
 
-        expect(targetContentBefore).to.not.equal(targetContentAfter);
-        expect(targetContentAfter).to.equal(sourceContent);
-    });
+        await cp.f.shx(existingFile1, existingFile2);
 
-    it('when destination is a directory, throws', async () => {
-        const a = await cp.f.shx(source_file1, emptyDirectory).catch(() => 'throw');
-        expect(a).to.equal('throw');
+        const destinationContentAfter = await fsp.readFile(existingFile2, 'utf8');
+        const sourceContentAfter = await fsp.readFile(existingFile1, 'utf8');
+
+        assert(destinationContentBefore !== destinationContentAfter);
+        assert(destinationContentAfter === sourceContentBefore);
+        assert(sourceContentAfter === sourceContentBefore);
     });
 });
 
 describe('cp -r', async () => {
 
     it('given a nested directory and empty destination, copies everything', async () => {
-        await cp.r.shx(source_root, destination_root);
+        await cp.r.shx(existingDirectory, emptySpace);
 
         const [
-            sc1,
-            sc2,
-            sc3,
-            dc1,
-            dc2,
-            dc3
+            s1,
+            s2,
+            s3,
+
+            d1,
+            d2,
+            d3
         ] = await Promise.all([
-            fsp.readFile(source_file1, 'utf8'),
-            fsp.readFile(source_file2, 'utf8'),
-            fsp.readFile(source_file3, 'utf8'),
-            fsp.readFile(destination_file1, 'utf8'),
-            fsp.readFile(destination_file2, 'utf8'),
-            fsp.readFile(destination_file3, 'utf8'),
+            fsp.readFile(existingSubfile, 'utf8'),
+            fsp.readFile(existingFile1, 'utf8'),
+            fsp.readFile(existingFile2, 'utf8'),
+            
+            fsp.readFile(fixRoot(existingSubfile), 'utf8'),
+            fsp.readFile(fixRoot(existingFile1), 'utf8'),
+            fsp.readFile(fixRoot(existingFile2), 'utf8'),
         ]);
 
-        expect(sc1).to.equal(dc1);
-        expect(sc2).to.equal(dc2);
-        expect(sc3).to.equal(dc3);
+        assert(s1 === d1);
+        assert(s2 === d2);
+        assert(s3 === d3);
     });
 
     it('when destination exists, throws', async () => {
-        const a = await cp.r.shx(source_root, destination_existing_root).catch(() => 'throw');
-        expect(a).to.equal('throw');
-    });
-
-    it('given a destination without existing directory, throws', async () => {
-        const a = await cp.r.shx(source_root, nonExisting2).catch(() => 'throw');
-        expect(a).to.equal('throw');
+        rejects(cp.r.shx(existingDirectory, otherExistingDirectory));
     });
 });
 
 describe('cp -rf', async () => {
 
     it('given a nested directory and empty destination, copies everything', async () => {
-        await cp.rf.shx(source_root, destination_root);
+        await cp.rf.shx(existingDirectory, emptySpace);
 
         const [
-            sc1,
-            sc2,
-            sc3,
-            dc1,
-            dc2,
-            dc3
-        ] = await Promise.all([
-            fsp.readFile(source_file1, 'utf8'),
-            fsp.readFile(source_file2, 'utf8'),
-            fsp.readFile(source_file3, 'utf8'),
-            fsp.readFile(destination_file1, 'utf8'),
-            fsp.readFile(destination_file2, 'utf8'),
-            fsp.readFile(destination_file3, 'utf8'),
-        ]);
+            s1,
+            s2,
+            s3,
 
-        expect(sc1).to.equal(dc1);
-        expect(sc2).to.equal(dc2);
-        expect(sc3).to.equal(dc3);
+            d1,
+            d2,
+            d3
+        ] = await Promise.all([
+            fsp.readFile(existingSubfile, 'utf8'),
+            fsp.readFile(existingFile1, 'utf8'),
+            fsp.readFile(existingFile2, 'utf8'),
+
+            fsp.readFile(fixRoot(existingSubfile), 'utf8'),
+            fsp.readFile(fixRoot(existingFile1), 'utf8'),
+            fsp.readFile(fixRoot(existingFile2), 'utf8'),
+            ]);
+
+        assert(s1 === d1);
+        assert(s2 === d2);
+        assert(s3 === d3);
     });
 
     it('when destination exists, overwrites matching names and preserves old entries', async () => {
-        const contentOfOmmitedFile = await fsp.readFile(destination_existing_file1, 'utf8');
-        await cp.rf.shx(source_root, destination_existing_root);
 
         const [
-            sc1,
-            sc2,
-            sc3,
-            dc1,
-            dc2,
-            dc3
+            contentSubfile1Before,
+            contentSubfile2Before
         ] = await Promise.all([
-            fsp.readFile(source_file1, 'utf8'),
-            fsp.readFile(source_file2, 'utf8'),
-            fsp.readFile(source_file3, 'utf8'),
-            fsp.readFile(destination_existing_file1, 'utf8'),
-            fsp.readFile(destination_existing_file2, 'utf8'),
-            fsp.readFile(destination_existing_file3, 'utf8'),
+            fsp.readFile(otherExistingSubfile1, 'utf8'),
+            fsp.readFile(otherExistingSubfile2, 'utf8')
+        ]);
+
+        await cp.rf.shx(existingDirectory, otherExistingDirectory);
+
+
+        const [
+            contentSubfile1After,
+            contentSubfile2After
+        ] = await Promise.all([
+            fsp.readFile(otherExistingSubfile1, 'utf8'),
+            fsp.readFile(otherExistingSubfile2, 'utf8')
             ]);
         
-        expect(existsSync(destination_existing_omited_dir)).true;
-        expect(contentOfOmmitedFile).to.equal(dc1);
-        expect(sc1).to.not.equal(dc1);
-        expect(sc2).to.equal(dc2);
-        expect(sc3).to.equal(dc3);
-    });
-
-    it('given a destination without existing directory, throws', async () => {
-        const a = await cp.rf.shx(source_root, nonExisting2).catch(() => 'throw');
-        expect(a).to.equal('throw');
+        const subFile1Changed = contentSubfile1Before !== contentSubfile1After;
+        const subFile2Preserved = contentSubfile2Before === contentSubfile2After;
+        
+        assert(subFile1Changed);
+        assert(subFile2Preserved);
     });
 });

@@ -7,7 +7,8 @@ class Ls {
     
    private  _shallow = async dirname => {
         const entryNames = await fs.readdir(dirname);
-        const absoluteEntryPaths = entryNames.map(name => resolve(dirname, name));
+       const absoluteEntryPaths = entryNames.map(name => resolve(dirname, name));
+       
         return absoluteEntryPaths;
     }
 
@@ -54,6 +55,7 @@ class LsRecursive {
         if (isDirectory) {
             const resNested = await this._recursive(dirname);
             const res = flatten(resNested);
+
             return res;
         } else {
             return [dirname];
@@ -61,4 +63,4 @@ class LsRecursive {
     }
 }
 
-export default new Ls;
+export default new Ls();

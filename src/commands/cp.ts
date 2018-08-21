@@ -21,6 +21,7 @@ class Cp {
 
     async shx(source, destination): Promise<void> {
         const p = fs.promises.copyFile(source, destination, DONT_OVERWIRTE);
+
         return p;
     }
 }
@@ -29,6 +30,7 @@ class CpForce {
 
     async shx(source, destination): Promise<void> {
         const p = fs.promises.copyFile(source, destination);
+
         return p;
     }
 }
@@ -37,6 +39,7 @@ class CpRecursive {
 
     private async justCopyFile(source, destination) {
         const p = fs.promises.copyFile(source, destination, DONT_OVERWIRTE);
+
         return p;
     }
 
@@ -98,6 +101,7 @@ class CpRecursiveForce {
 
     private async justCopyFile(source, destination) {
         const p = fs.promises.copyFile(source, destination);
+        
         return p;
     }
 
@@ -125,6 +129,7 @@ class CpRecursiveForce {
                 return;
             } else {
                 await fs.promises.unlink(destination);
+
                 return fs.promises.mkdir(destination);
             }
 
@@ -163,4 +168,4 @@ class CpRecursiveForce {
     }
 }
 
-export default new Cp
+export default new Cp()
