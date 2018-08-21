@@ -1,4 +1,4 @@
-import touch from './commands/touch';
+import mv from './commands/mv';
 
 const main = async () => {
 
@@ -7,16 +7,10 @@ const main = async () => {
     const name3 = 'xyz.txt';
     const name4 = './aaa/abc.txt';
 
-    const x = await touch.shx(name4).catch(e => {
-        console.log(3 + 3);
-        console.log(e)
-    });
+    const b = await mv.shx(name3, name1);
 
-
-    // const res = await $.cp.rf.shx(name1, name2);
-    // const res = $.cp.rf.shx(name1, name2);
-    // console.log(res);
-
+    console.log(b);
+    
 };
 
 main();

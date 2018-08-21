@@ -6,6 +6,7 @@
     "license": "MIT",
     "dependencies": {
         "@types/node": "^10.7.0",
+        "glob": "^7.1.2",
         "ts-node": "^7.0.1",
         "typescript": "^3.0.1"
     },
@@ -18,6 +19,7 @@
         "mocha": "^5.2.0"
     },
     "scripts": {
-        "test": "mkdir -p temp & mocha test -r ts-node/register test/**/cp.spec.ts"
+        "test": "mkdir -p temp & mocha test -r ts-node/register test/**/mv.spec.ts",
+        "test:debug": "mkdir -p temp & mocha test -r ts-node/register test/**/mv.spec.ts --inspect-brk"
     }
 }
