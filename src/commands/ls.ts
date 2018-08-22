@@ -27,7 +27,6 @@ class Ls {
     }
 }
 
-
 class LsRecursive {
 
     private _recursive = async dirname => {

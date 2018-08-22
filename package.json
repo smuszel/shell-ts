@@ -1,16 +1,15 @@
 {
     "name": "shell-ts",
     "version": "0.0.1",
-    "description": "Fluent, unix like interface with helpers around core node functionalities.",
+    "description": "Fluent, unix like interface for file system",
     "author": "",
     "license": "MIT",
-    "dependencies": {
-        "@types/node": "^10.7.0",
-        "glob": "^7.1.2",
-        "ts-node": "^7.0.1",
-        "typescript": "^3.0.1"
-    },
     "devDependencies": {
+        "@types/node": "^10.7.0",
+        "typescript": "^3.0.1",
+        "ts-node": "^7.0.1",
+        "ts-lint": "^4.5.1",
+        "glob": "^7.1.2",
         "@types/ramda": "^0.25.36",
         "@types/chai": "^4.1.4",
         "@types/mocha": "^5.2.5",

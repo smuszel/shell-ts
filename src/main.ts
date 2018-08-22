@@ -1,16 +1,27 @@
-import mv from './commands/mv';
+import rm from './commands/rm';
+import { mkdirSync, writeFileSync } from 'fs';
+import { resolve, join } from 'path';
+
+const root = resolve('temp', 'abc');
+const d1 = join(root, 'aaa');
+const d2 = join(root, 'bbb');
+
+const f1 = join(d1, 'x.ts')
+
+const setup = () => {
+    mkdirSync(root)
+    mkdirSync(d1)
+    mkdirSync(d2)
+
+    writeFileSync(f1, 'aaa')
+}
+
+const teardown = () => { };
 
 const main = async () => {
+    // setup();
 
-    const name1 = 'testdir';
-    const name2 = 'testdir123';
-    const name3 = 'xyz.txt';
-    const name4 = './aaa/abc.txt';
-
-    const b = await mv.shx(name3, name1);
-
-    console.log(b);
-    
+    await rm.rf.shx(root);
 };
 
 main();

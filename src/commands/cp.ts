@@ -4,7 +4,6 @@ import { exists, isDirectory } from '../helpers';
 
 const DONT_OVERWIRTE = fs.constants.COPYFILE_EXCL;
 
-
 class Cp {
     
     get f() {
