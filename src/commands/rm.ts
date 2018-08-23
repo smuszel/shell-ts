@@ -26,7 +26,6 @@ class RmRecursiveForce {
     }
 
     private async _execute(target) {
-        debugger
         const st = await fsp.stat(target);
     
         if (st.isDirectory()) {

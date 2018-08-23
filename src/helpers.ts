@@ -15,7 +15,9 @@ export const fullReaddir = async dirname => {
         isFile: s.isFile(),
         isDirectory: s.isDirectory(),
     });
+    
     const fsEntries = zipWith(stats, absolutePaths, create);
+
     return fsEntries as FileSystemEntry[];
 };
 

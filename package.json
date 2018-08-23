@@ -19,7 +19,7 @@
     },
     "scripts": {
         "test:all": "mkdir -p temp & mocha test -r ts-node/register test/**/*.spec.ts",
-        "test": "mkdir -p temp & mocha test -r ts-node/register test/**/touch.spec.ts",
-        "test:debug": "mkdir -p temp & mocha test -r ts-node/register test/**/touch.spec.ts --inspect-brk"
+        "test": "mkdir -p temp & mocha test -r ts-node/register test/**/fgrep.spec.ts",
+        "test:debug": "mkdir -p temp & mocha test -r ts-node/register test/**/fgrep.spec.ts --inspect-brk"
     }
 }
