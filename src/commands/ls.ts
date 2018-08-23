@@ -5,7 +5,7 @@ import { isDirectory, fullReaddir } from '../helpers';
 
 class Ls {
     
-   private  _shallow = async dirname => {
+   private _shallow = async dirname => {
         const entryNames = await fs.readdir(dirname);
        const absoluteEntryPaths = entryNames.map(name => resolve(dirname, name));
        

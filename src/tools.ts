@@ -9,3 +9,9 @@ export const flatten = (arr: any[]): any[] => {
 
 export const zipWith = (a1, a2, f) => a1.map((x, i) => f(x, a2[i]));
 
+export const assert = (supposedlyTuthy, msg) => {
+    if (!supposedlyTuthy) {
+        throw new Error(msg);
+    }
+}
+
