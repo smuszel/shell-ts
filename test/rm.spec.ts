@@ -3,7 +3,8 @@ import rm from '../src/commands/rm';
 import { assert } from 'chai';
 import { resolve, join } from 'path';
 import { beforeEach } from 'mocha';
-import { rimrafSync, rejects } from './util';
+import { rejects } from './util';
+import rimraf from 'rimraf';
 
 const root = resolve('temp', 'rm_root');
 const dir1 = join(root, 'aaa');
@@ -22,7 +23,7 @@ beforeEach('', async () => {
 })
 
 afterEach('', () => {
-    rimrafSync(root);
+    rimraf.sync(root);
 })
 
 

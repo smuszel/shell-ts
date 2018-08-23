@@ -1,8 +1,9 @@
 import { expect } from 'chai';
 import { promises as fsp } from 'fs';
-import { rejects, rimrafSync } from './util';
+import { rejects } from './util';
 import fgrep from '../src/commands/fgrep';
 import { resolve, join } from 'path';
+import rimraf from 'rimraf';
 
 const content1 = 'a';
 const content2 = 'b';
@@ -27,7 +28,7 @@ before('', async () => {
 })
 
 after('', () => {
-    rimrafSync(root);
+    rimraf.sync(root);
 })
 
 describe('grepf', () => {

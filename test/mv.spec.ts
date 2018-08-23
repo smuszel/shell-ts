@@ -3,7 +3,8 @@ import { promises as fsp } from 'fs';
 import { assert } from 'chai';
 import { resolve, join, basename } from 'path';
 import { exists } from '../src/helpers';
-import { rimrafSync, rejects } from './util';
+import { rejects } from './util';
+import rimraf from 'rimraf';
 
 const root = resolve('temp', 'mv_root');
 
@@ -23,7 +24,7 @@ beforeEach('Content setup', async () => {
 });
 
 afterEach('Content removal', () => {
-    rimrafSync(root);
+    rimraf.sync(root);
 });
 
 describe('mv', () => {

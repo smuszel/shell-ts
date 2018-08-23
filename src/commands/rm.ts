@@ -6,8 +6,8 @@ export class Rm {
         return new RmRecursiveForce();
     }
 
-    async shx(target) {
-        fsp.unlink(target)
+    shx(target) {
+        return fsp.unlink(target);
     }
 }
 
@@ -31,12 +31,8 @@ class RmRecursiveForce {
         if (st.isDirectory()) {
             await this.removeDirectoryContents(target);
             await fsp.rmdir(target);
-
-            return
         } else {
             await this.removeFile(target);
-
-            return ;
         }
     }
     

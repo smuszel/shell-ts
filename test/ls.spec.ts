@@ -1,8 +1,9 @@
-import { rejects, rimrafSync } from './util';
+import { rejects } from './util';
 import { promises as fsp } from 'fs';
 import { expect, assert } from 'chai';
 import { resolve, join } from 'path';
 import ls from '../src/commands/ls';
+import rimraf from 'rimraf';
 
 const root = resolve('temp', 'ls_root');
 
@@ -30,8 +31,8 @@ before('', async () => {
     ]);
 });
 
-after('remove suite root', () => {
-    rimrafSync(root);
+after('', () => {
+    rimraf.sync(root);
 });
 
 describe('ls', async () => {

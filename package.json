@@ -5,17 +5,19 @@
     "author": "",
     "license": "MIT",
     "devDependencies": {
-        "@types/node": "^10.7.0",
-        "typescript": "^3.0.1",
-        "ts-node": "^7.0.1",
-        "ts-lint": "^4.5.1",
-        "glob": "^7.1.2",
-        "@types/ramda": "^0.25.36",
         "@types/chai": "^4.1.4",
         "@types/mocha": "^5.2.5",
-        "ramda": "^0.25.0",
+        "@types/node": "^10.7.0",
+        "@types/ramda": "^0.25.36",
+        "@types/rimraf": "^2.0.2",
         "chai": "^4.1.2",
-        "mocha": "^5.2.0"
+        "glob": "^7.1.2",
+        "mocha": "^5.2.0",
+        "ramda": "^0.25.0",
+        "rimraf": "^2.6.2",
+        "ts-lint": "^4.5.1",
+        "ts-node": "^7.0.1",
+        "typescript": "^3.0.1"
     },
     "scripts": {
         "test:all": "mkdir -p temp & mocha test -r ts-node/register test/**/*.spec.ts",

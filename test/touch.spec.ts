@@ -2,7 +2,7 @@ import { promises as fsp, existsSync } from 'fs';
 import { assert } from 'chai';
 import { resolve } from 'path';
 import touch from '../src/commands/touch';
-import { rimrafSync } from './util';
+import rimraf from 'rimraf';
 
 const root = resolve('temp', 'touch_root');
 
@@ -16,7 +16,7 @@ beforeEach('', async () => {
 })
 
 afterEach('', () => {
-    rimrafSync(root);
+    rimraf.sync(root);
 })
 
 describe('touch', () => {

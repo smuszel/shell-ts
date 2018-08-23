@@ -1,8 +1,9 @@
-import { rejects, rimrafSync } from './util';
+import { rejects } from './util';
 import { promises as fsp,  } from 'fs';
 import { assert } from 'chai';
 import { resolve, join } from 'path';
 import cp from '../src/commands/cp';
+import rimraf from 'rimraf';
 
 const emptySpaceBasename = 'vvv';
 const existingDirectoryBasename = 'aaa';
@@ -62,8 +63,8 @@ beforeEach('set up directory structure', async () => {
     ]);
 });
 
-afterEach('remove directory', () => {
-    rimrafSync('temp/cp_root');
+afterEach('', () => {
+    rimraf.sync(root);
 });
 
 describe('cp', async () => {
