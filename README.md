@@ -1,12 +1,12 @@
 ### Example
-`
+
     const someFolder = path.resolve('foo');
     const destination = path.resolve('temp', 'bar');
 
     await cp.rf(someFolder, destination); // copies directory foo recursively
     await rm.rf(someFolder) // cleans up
     const contents = await ls.r('temp'); // gets names of all files and directories
-`
+
 
 ### Motivation
 
