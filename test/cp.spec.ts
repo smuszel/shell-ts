@@ -169,7 +169,7 @@ describe('cp -rf', async () => {
         assert(s3 === d3);
     });
 
-    it('given conflict, overwrites', async () => {
+    it('given conflict, overwrites only files that match', async () => {
         debugger
         const [
             contentSubfile1Before,

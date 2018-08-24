@@ -13,3 +13,4 @@
 1. Learning async in node.js
 2. Dabbing with typescript type system
 3. Making unixy DSL-like interface
+4. Excercising writing ascetic, clean code
