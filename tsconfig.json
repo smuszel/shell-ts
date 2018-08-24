@@ -6,8 +6,6 @@
         "experimentalDecorators": true,
         "lib": ["es2018"],
         "sourceMap": false,
-        "typeRoots": ["./@types", "./node_modules/@types"],
-        "composite": true,
         "pretty": true,
         "outDir": "./lib",
     },

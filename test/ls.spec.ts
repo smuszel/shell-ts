@@ -3,7 +3,7 @@ import { promises as fsp } from 'fs';
 import { expect, assert } from 'chai';
 import { resolve, join } from 'path';
 import ls from '../src/commands/ls';
-import rimraf from 'rimraf';
+const rimraf = require('rimraf');
 
 const root = resolve('temp', 'ls_root');
 
@@ -38,7 +38,7 @@ after('', () => {
 describe('ls', async () => {
 
     it('given a directory, returns shallow content absoulte names', async () => {
-        const names = await ls.shx(root);
+        const names = await ls(root);
         
         expect(names).to.include(file1);
         expect(names).to.include(subdirectory1);
@@ -46,17 +46,15 @@ describe('ls', async () => {
         expect(names).to.not.include(file2);
     });
 
-    it('given a file, returns absolute name of that file in array', async () => {
-        const names = await ls.shx(file1);
-
-        assert.deepEqual(names, [file1]);
+    it('given a file, throws', async () => {
+        rejects(ls(file1));
     })
 });
 
 describe('ls -r', async () => {
 
     it('given a directory, returns all file names in that branch', async () => {
-        const names = await ls.r.shx(root);
+        const names = await ls.r(root);
 
         expect(names).to.include(file1);
         expect(names).to.include(file2);
@@ -65,19 +63,19 @@ describe('ls -r', async () => {
     });
 
     it('given a directory, returns all directory names in that branch', async () => {
-        const names = await ls.r.shx(root);
+        const names = await ls.r(root);
 
         expect(names).to.include(subdirectory1);
         expect(names).to.include(subdirectory2);
     });
 
     it('given a directory, will not include its name in output', async () => {
-        const names = await ls.r.shx(root);
+        const names = await ls.r(root);
 
         expect(names).to.not.include(root);
     });
 
     it('given a file, throws', async () => {
-        rejects(ls.r.shx(file1));
+        rejects(ls.r(file1));
     });
 });

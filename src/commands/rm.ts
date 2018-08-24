@@ -1,44 +1,31 @@
 import { promises as fsp } from 'fs';
 import { join } from 'path';
 
-export class Rm {
-    get rf() {
-        return new RmRecursiveForce();
-    }
+const _rm = (targetPath: string) => {
+    return fsp.unlink(targetPath);
+}
 
-    shx(target) {
-        return fsp.unlink(target);
+const _recursiveForce = async (targetPath: string) => {
+    const targetStat = await fsp.stat(targetPath);
+
+    if (targetStat.isDirectory()) {
+        await _removeDirectoryContents(targetPath);
+        await fsp.rmdir(targetPath);
+    } else if (targetStat.isFile()) {
+        await _rm(targetPath);
     }
 }
 
-class RmRecursiveForce {
+const _removeDirectoryContents = async (dir) => {
+    const contents = await fsp.readdir(dir);
+    const contentsPaths = contents.map(x => join(dir, x));
+    const p = Promise.all(contentsPaths.map(n => _recursiveForce(n)));
 
-    private async removeDirectoryContents(dir) {
-        const contents = await fsp.readdir(dir);
-        const contentsPaths = contents.map(x => join(dir, x));
-        const p = Promise.all(contentsPaths.map(n => this._execute(n)));
-
-        return p;
-    }
-
-    private removeFile(file) {
-        return fsp.unlink(file);
-    }
-
-    private async _execute(target) {
-        const st = await fsp.stat(target);
-    
-        if (st.isDirectory()) {
-            await this.removeDirectoryContents(target);
-            await fsp.rmdir(target);
-        } else {
-            await this.removeFile(target);
-        }
-    }
-    
-    shx(target) {
-        return this._execute(target);
-    }
+    return p;
 }
 
-export default new Rm();
+const rm = Object.assign(_rm, {
+    rf: _recursiveForce
+})
+
+export default rm;

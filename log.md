@@ -11,3 +11,13 @@
 11. Now your job is to implement that accross the lib
 12. Start by resolving each of the commands to be cleanly fit to the concept
 13. After succeeded test move to other command
+
+---
+
+1. Acually its cleaner with assign and inline props
+2. I went scouring through typescript docs
+3. I found out about union types and aliases
+4. And infrence through guards
+5. And esnext flat/flatmap support
+6. And unknown type
+7. Also I dabbed a bit in generics

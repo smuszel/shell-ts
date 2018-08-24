@@ -4,7 +4,7 @@ import { assert } from 'chai';
 import { resolve, join } from 'path';
 import { beforeEach } from 'mocha';
 import { rejects } from './util';
-import rimraf from 'rimraf';
+const rimraf = require('rimraf');
 
 const root = resolve('temp', 'rm_root');
 const dir1 = join(root, 'aaa');
@@ -30,28 +30,28 @@ afterEach('', () => {
 describe('rm', () => {
 
     it('given a file, disposes of it', async () => {
-        await rm.shx(file);
+        await rm(file);
         const fileRemoved = !existsSync(file);
 
         assert(fileRemoved);
     })
 
     it('given directory throws', async () => {
-        rejects(rm.shx(dir1));
+        rejects(rm(dir1));
     })
 })
 
 describe('rm -rf', () => {
 
     it('given a file, disposes of it', async () => {
-        await rm.rf.shx(file);
+        await rm.rf(file);
         const fileRemoved = !existsSync(file);
 
         assert(fileRemoved);
     })
     
     it('given directory removes it with its contents', async () => {
-        await rm.rf.shx(dir1);
+        await rm.rf(dir1);
         const dirRemoved = !existsSync(dir1);
         
         assert(dirRemoved);

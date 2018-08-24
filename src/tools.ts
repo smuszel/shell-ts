@@ -1,17 +1,21 @@
-export const flatten = (arr: any[]): any[] => {
-    const h = (flat, toFlatten) => flat.concat(Array.isArray(toFlatten)
-        ? flatten(toFlatten)
-        : toFlatten
-    );
-    
-    return arr.reduce(h, []);
-}
+export const zipWith = <T, U, Q>(
+    as: T[], bs: U[], zipper: (a: T, b: U) => Q)
+    : Q[] => as.map((x, i) => zipper(x, bs[i]));
 
-export const zipWith = (a1, a2, f) => a1.map((x, i) => f(x, a2[i]));
 
-export const assert = (supposedlyTuthy, msg) => {
+export const assert = (supposedlyTuthy: any, msg?: string): void => {
     if (!supposedlyTuthy) {
         throw new Error(msg);
     }
 }
 
+// At the time of writing this module (8 Aug) latest node was using V8 6.7,
+// which did not yet have support for Array.prototype.flat and others
+export const flatten = <T>(arr: T[][]): T[] => {
+    const h = (flat, toFlatten) => flat.concat(Array.isArray(toFlatten)
+        ? flatten(toFlatten)
+        : toFlatten
+    );
+
+    return arr.reduce(h, []);
+}

@@ -3,7 +3,7 @@ import { promises as fsp,  } from 'fs';
 import { assert } from 'chai';
 import { resolve, join } from 'path';
 import cp from '../src/commands/cp';
-import rimraf from 'rimraf';
+const rimraf = require('rimraf');
 
 const emptySpaceBasename = 'vvv';
 const existingDirectoryBasename = 'aaa';
@@ -70,7 +70,7 @@ afterEach('', () => {
 describe('cp', async () => {
 
     it('given a file and empty destination within existing directory, clones file', async () => {
-        await cp.shx(existingSubfile, emptySpace);
+        await cp(existingSubfile, emptySpace);
 
 
         const [sourceContent, destinationContent] = await Promise.all([
@@ -83,11 +83,11 @@ describe('cp', async () => {
     });
 
     it('given a directory, throws', async () => {
-        rejects(cp.shx(existingDirectory, emptySpace));
+        rejects(cp(existingDirectory, emptySpace));
     });
 
     it('given any conflict, throws', () => {
-        rejects(cp.shx(existingFile1, existingFile2));
+        rejects(cp(existingFile1, existingFile2));
     });
 });
 
@@ -97,7 +97,7 @@ describe('cp -f', async () => {
         const destinationContentBefore = await fsp.readFile(existingFile2, 'utf8');
         const sourceContentBefore = await fsp.readFile(existingFile1, 'utf8');
 
-        await cp.f.shx(existingFile1, existingFile2);
+        await cp.f(existingFile1, existingFile2);
 
         const destinationContentAfter = await fsp.readFile(existingFile2, 'utf8');
         const sourceContentAfter = await fsp.readFile(existingFile1, 'utf8');
@@ -111,7 +111,7 @@ describe('cp -f', async () => {
 describe('cp -r', async () => {
 
     it('given a nested directory and empty destination, copies everything', async () => {
-        await cp.r.shx(existingDirectory, emptySpace);
+        await cp.r(existingDirectory, emptySpace);
 
         const [
             s1,
@@ -137,14 +137,14 @@ describe('cp -r', async () => {
     });
 
     it('when destination exists, throws', async () => {
-        rejects(cp.r.shx(existingDirectory, otherExistingDirectory));
+        rejects(cp.r(existingDirectory, otherExistingDirectory));
     });
 });
 
 describe('cp -rf', async () => {
 
     it('given a nested directory and empty destination, copies everything', async () => {
-        await cp.rf.shx(existingDirectory, emptySpace);
+        await cp.rf(existingDirectory, emptySpace);
 
         const [
             s1,
@@ -169,8 +169,8 @@ describe('cp -rf', async () => {
         assert(s3 === d3);
     });
 
-    it('when destination exists, overwrites matching names and preserves old entries', async () => {
-
+    it('given conflict, overwrites', async () => {
+        debugger
         const [
             contentSubfile1Before,
             contentSubfile2Before
@@ -179,8 +179,7 @@ describe('cp -rf', async () => {
             fsp.readFile(otherExistingSubfile2, 'utf8')
         ]);
 
-        await cp.rf.shx(existingDirectory, otherExistingDirectory);
-
+        await cp.rf(existingDirectory, otherExistingDirectory);
 
         const [
             contentSubfile1After,

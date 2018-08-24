@@ -2,9 +2,8 @@ import mv from '../src/commands/mv';
 import { promises as fsp } from 'fs';
 import { assert } from 'chai';
 import { resolve, join, basename } from 'path';
-import { exists } from '../src/helpers';
-import { rejects } from './util';
-import rimraf from 'rimraf';
+import { rejects, exists } from './util';
+const rimraf = require('rimraf');
 
 const root = resolve('temp', 'mv_root');
 
@@ -30,7 +29,7 @@ afterEach('Content removal', () => {
 describe('mv', () => {
     
     it('given empty destination with existing path, moves entry at source', async () => {
-        await mv.shx(existingFile1, nonExistingWithin);
+        await mv(existingFile1, nonExistingWithin);
         const [sourceExists, destinationExists] = await Promise.all([
             exists(existingFile1),
             exists(nonExistingWithin)
@@ -41,11 +40,11 @@ describe('mv', () => {
     })
 
     it('given destination as other file, throws', async () => {
-        rejects(mv.shx(existingFile1, existingFile2));
+        rejects(mv(existingFile1, existingFile2));
     })
 
     it('given destination as directory, attempts to move source inside', async () => {
-        await mv.shx(existingFile1, existingDir);
+        await mv(existingFile1, existingDir);
         const sourceBasename = basename(existingFile1)
         const hopPath = join(existingDir, sourceBasename);
 
@@ -68,7 +67,7 @@ describe('mv', () => {
 describe('mv -f', () => {
 
     it('given source as directory and destination as file, overwrites', async () => {
-        await mv.f.shx(existingDir, existingFile1);
+        await mv.f(existingDir, existingFile1);
         const stat = await fsp.stat(existingFile1);
 
         assert(stat.isDirectory());
@@ -79,7 +78,7 @@ describe('mv -f', () => {
             fsp.readFile(existingFile1, 'utf8'),
             fsp.readFile(existingFile2, 'utf8'),
         ]);
-        await mv.f.shx(existingFile1, existingFile2);
+        await mv.f(existingFile1, existingFile2);
         
         const content2After = await fsp.readFile(existingFile2, 'utf8');
         const soureStillExists = await exists(existingFile1);

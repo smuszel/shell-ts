@@ -3,7 +3,7 @@ import { promises as fsp } from 'fs';
 import { rejects } from './util';
 import fgrep from '../src/commands/fgrep';
 import { resolve, join } from 'path';
-import rimraf from 'rimraf';
+const rimraf = require('rimraf');
 
 const content1 = 'a';
 const content2 = 'b';
@@ -31,9 +31,9 @@ after('', () => {
     rimraf.sync(root);
 })
 
-describe('grepf', () => {
+describe('fgrep', () => {
     it('given path to directory, returns all files that contents satisfy pattern', async () => {
-        const matchedFiles = await fgrep.shx(root, pattern);
+        const matchedFiles = await fgrep(root, pattern);
 
         expect(matchedFiles).to.include(file1);
         expect(matchedFiles).to.include(file3);
@@ -41,6 +41,6 @@ describe('grepf', () => {
     })
 
     it('given path to file, throws', () => {
-        rejects(fgrep.shx(file1, pattern))
+        rejects(fgrep(file1, pattern))
     })
 })

@@ -1,48 +1,34 @@
 import { promises as fsp } from 'fs';
-import { exists } from '../helpers';
 import { join, basename } from 'path';
 
-class Mv {
+const _mv = async (sourcePath: string, destinationPath: string): Promise<void> => {
+    const destinationStat = await fsp.stat(destinationPath)
+        .catch(() => fsp.rename(sourcePath, destinationPath));
+    
+    if (destinationStat && destinationStat.isDirectory()) {
+        const sourceBasename = basename(sourcePath);
+        const newDestinationPath = join(destinationPath, sourceBasename);
 
-    get f() {
-        return new MvForce();
-    }
-
-    async shx(source, destination): Promise<void> {
-        const destinationExists = await exists(destination);
-        
-        if (destinationExists) {
-            const destinationStat = await fsp.stat(destination);
-            if (destinationStat.isFile()) {
-                throw new Error('override attempt');
-            } else {
-                const sourceBasename = basename(source);
-                const newDest = join(destination, sourceBasename);
-                
-                return this.shx(source, newDest);
-            }
-        } else {
-            return fsp.rename(source, destination);
-        }
+        return _mv(sourcePath, newDestinationPath);
     }
 }
 
-class MvForce {
-    async shx(source, destination): Promise<void> {
-        const destinationExists = await exists(destination);
+const _force = async (sourcePath: string, destinationPath: string): Promise<void> => {
+    const destinationStat = await fsp.stat(destinationPath)
+        .catch(() => fsp.rename(sourcePath, destinationPath));
+    
+    if (destinationStat && destinationStat.isDirectory()) {
+        const sourceBasename = basename(sourcePath);
+        const newDestinationPath = join(destinationPath, sourceBasename);
 
-        if (destinationExists) {
-            const destinationStat = await fsp.stat(destination);
-            if (destinationStat.isDirectory()) {
-                const sourceBasename = basename(source);
-                const newDest = join(destination, sourceBasename);
-
-                return this.shx(source, newDest);
-            }
-        }
-        
-        return fsp.rename(source, destination);
-    }
+        return _force(sourcePath, newDestinationPath);
+    } else if (destinationStat && destinationStat.isFile()) {
+        return fsp.rename(sourcePath, destinationPath);
+    } 
 }
 
-export default new Mv();
+const mv = Object.assign(_mv, {
+    f: _force
+})
+
+export default mv;

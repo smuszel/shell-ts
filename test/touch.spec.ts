@@ -2,7 +2,7 @@ import { promises as fsp, existsSync } from 'fs';
 import { assert } from 'chai';
 import { resolve } from 'path';
 import touch from '../src/commands/touch';
-import rimraf from 'rimraf';
+const rimraf = require('rimraf');
 
 const root = resolve('temp', 'touch_root');
 
@@ -22,7 +22,7 @@ afterEach('', () => {
 describe('touch', () => {
 
     it('given non existing file, makes new file', async () => {
-        await touch.shx(emptySpace1, emptySpace2);
+        await touch(emptySpace1, emptySpace2);
 
         const file1Created = existsSync(emptySpace1);
         const file2Created = existsSync(emptySpace2);
@@ -33,7 +33,7 @@ describe('touch', () => {
 
     it('given existing file, does not affect stats', async () => {        
         const statBefore = await fsp.stat(existingFile);
-        await touch.shx(existingFile);
+        await touch(existingFile);
 
         await new Promise(rez => setTimeout(rez, 1));
         const statAfter = await fsp.stat(existingFile);
@@ -43,7 +43,7 @@ describe('touch', () => {
 
     it('given existing file, does not overwrite it', async () => {
         const contentBefore = await fsp.readFile(existingFile, 'utf8');
-        await touch.shx(existingFile);
+        await touch(existingFile);
         const contentAfter = await fsp.readFile(existingFile, 'utf8');
         const sameContent = contentAfter === contentBefore;
 

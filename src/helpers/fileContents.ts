@@ -1,20 +1,16 @@
 import { promises as fsp } from 'fs';
 
-const fileContents = file => fsp.readFile(file, 'utf8');
+const _fileContents = (filePath: string) => fsp.readFile(filePath, 'utf8');
 
-const testPattern = async (file, pattern) => {
-    const content = await fileContents(file);
+const fileContents_test = async (filePath: string, pattern: RegExp) => {
+    const content = await _fileContents(filePath);
     const satisfies = pattern.test(content);
 
     return satisfies;
 }
 
-interface fileContents {
-    (file: string): Promise<string>;
-    test: (file: string, pattern: RegExp) => Promise<boolean>
-}
+const fileContents = Object.assign(_fileContents, {
+    test: fileContents_test
+});
 
-//@ts-ignore
-fileContents.test = testPattern;
-
-export default fileContents as fileContents;
+export default fileContents;
